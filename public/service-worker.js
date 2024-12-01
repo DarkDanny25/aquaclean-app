@@ -86,6 +86,22 @@ self.addEventListener('fetch', (event) => {
   );
 });
 
+self.addEventListener('push', (event) => {
+  const data = event.data ? event.data.json() : {};
+  console.log('Datos de la notificación push:', data);
+
+  const title = data.title || '¡Nueva Notificación!';
+  const options = {
+    body: data.message || 'Tienes un nuevo mensaje.',
+    icon: '/icon-192x192.png',
+    badge: '/icon-192x192.png',
+  };
+
+  event.waitUntil(
+    self.registration.showNotification(title, options)
+  );
+});
+
 self.addEventListener('message', (event) => {
   const allowedOrigins = ['https://aquaclean-app.vercel.app'];
 
