@@ -26,13 +26,13 @@ const Message = styled.p`
 `;
 
 const WifiIcon = styled(FontAwesomeIcon)`
-  font-size: 10rem;
+  font-size: 90px;
   color: #dc3545;
   margin-bottom: 1.5rem;
 `;
 
 const FrownIcon = styled(FontAwesomeIcon)`
-  font-size: 8rem;
+  font-size: 65px;
   color: #dc3545;
   margin-top: 1rem;
 `;
