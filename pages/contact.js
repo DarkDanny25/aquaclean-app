@@ -88,10 +88,13 @@ const ContactForm = () => {
         topic: '',
       });
 
-      const subscriptionId = localStorage.getItem('subscriptionId');
-      if (subscriptionId) {
-        await sendPushNotification(subscriptionId);
-      }
+      // Esperamos un breve momento para mostrar la notificación de éxito antes de enviar la push
+      setTimeout(async () => {
+        const subscriptionId = localStorage.getItem('subscriptionId');
+        if (subscriptionId) {
+          await sendPushNotification(subscriptionId);
+        }
+      }, 3000); // Esperamos 3 segundos antes de enviar la notificación push
 
     } catch (error) {
       setNotification({ type: 'error', message: 'Hubo un error al enviar el mensaje.' });
@@ -232,7 +235,7 @@ const ContactForm = () => {
             <li>2. Juntos podemos mejorar</li>
             <p>Tus comentarios nos permiten evitar errores y seguir innovando en todo lo que hacemos.</p>
             <li>3. Gracias a ti crecemos más</li>
-            <p>Nuestro proyecto responde a una necesidad, y con tu ayuda podemos crecer aún más. No dudes en compartir tus ideas con nosotros.</p>
+            <p>Nuestro proyecto responde a una necesidad, y con tu ayuda podemos crecer aún más. No dudes en escribirnos.</p>
           </ol>
         </InfoSection>
       </FooterContainer>
