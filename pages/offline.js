@@ -9,9 +9,8 @@ const Container = styled.div`
   justify-content: center;
   min-height: 100vh;
   background-color: #f8f9fa;
-  text-align: center;
   padding: 20px;
-  font-family: Arial, sans-serif;
+  text-align: center;
 `;
 
 const Title = styled.h1`
@@ -26,21 +25,27 @@ const Message = styled.p`
   margin-bottom: 2rem;
 `;
 
+const WifiIcon = styled(FontAwesomeIcon)`
+  font-size: 10rem;
+  color: #dc3545;
+  margin-bottom: 1.5rem;
+`;
+
+const FrownIcon = styled(FontAwesomeIcon)`
+  font-size: 8rem;
+  color: #dc3545;
+  margin-top: 1rem;
+`;
+
 export default function Offline() {
   return (
     <Container>
-      <FontAwesomeIcon 
-        icon={faWifi} 
-        style={{ fontSize: '10rem', backgroundColor: '#dc3545', marginBottom: '1.5rem' }} 
-      />
+      <WifiIcon icon={faWifi} />
       <Title>¡Oops, parece que no tienes conexión!</Title>
       <Message>
         No pudimos cargar esta página. Por favor, verifica tu conexión a internet e inténtalo de nuevo.
       </Message>
-      <FontAwesomeIcon 
-        icon={faFrown} 
-        style={{ fontSize: '8rem', backgroundcolor: '#dc3545', marginTop: '1rem' }} 
-      />
+      <FrownIcon icon={faFrown} />
     </Container>
   );
 }
