@@ -25,6 +25,7 @@ const ContactForm = () => {
     topic: '',
   });
   const [notification, setNotification] = useState(null);
+  const [isOffline, setIsOffline] = useState(!navigator.onLine);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -51,46 +52,13 @@ const ContactForm = () => {
     }
   };
 
-  const validateName = (name) => {
-    const regex = /^[A-Za-zÁáÉéÍíÓóÚúÑñ\s]+$/;
-    if (name.trim().length < 3) return "El nombre debe tener al menos 3 caracteres.";
-    if (name.trim().length > 50) return "El nombre no debe exceder los 50 caracteres.";
-    if (!regex.test(name)) return "El nombre solo debe contener letras y espacios.";
-    return null;
-  };
-
-  const validateEmail = (email) => {
-    const regex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    return regex.test(email);
-  };
-
-  const validateMessage = (message) => {
-    if (message.trim().length < 10) return "El mensaje debe tener al menos 10 caracteres.";
-    if (message.trim().length > 300) return "El mensaje no debe exceder los 300 caracteres.";
-    return null;
-  };
-
-  const validateTopic = (topic) => {
-    if (topic && topic.trim().length < 3) {
-      return "El tema debe tener al menos 3 caracteres. Ejemplos: 'Información sobre el barco', 'Solicitar colaboración', 'Ideas de mejora'.";
-    }
-    if (topic && topic.trim().length > 100) {
-      return "El tema no debe exceder los 100 caracteres.";
-    }
-    return null;
-  };
-
   const validateForm = () => {
     const { name, email, message, topic } = formData;
     let errorMessage = null;
-
-    errorMessage = validateName(name) || errorMessage;
-    if (!validateEmail(email)) {
-      errorMessage = "El correo electrónico no es válido.";
-    }
-    errorMessage = validateMessage(message) || errorMessage;
-    errorMessage = validateTopic(topic) || errorMessage;
-
+    if (!/^[A-Za-zÁáÉéÍíÓóÚúÑñ\s]+$/.test(name)) errorMessage = "Nombre no válido";
+    if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email)) errorMessage = "Correo no válido";
+    if (message.length < 10) errorMessage = "El mensaje es muy corto";
+    if (topic && topic.length < 3) errorMessage = "El tema es muy corto";
     return errorMessage;
   };
 
@@ -103,31 +71,71 @@ const ContactForm = () => {
       return;
     }
 
+    if (isOffline) {
+      saveFormDataLocally();
+      setNotification({ type: 'info', message: 'Estás offline, el mensaje será enviado cuando te conectes.' });
+      return;
+    }
+
     try {
-      const response = await axios.post('https://backend-aquaclean.onrender.com/api/contact', formData);
+      await axios.post('https://backend-aquaclean.onrender.com/api/contact', formData);
       setNotification({ type: 'success', message: 'Mensaje enviado exitosamente' });
-
-      setFormData({
-        name: '',
-        email: '',
-        message: '',
-        topic: '',
-      });
-
-      const subscriptionId = localStorage.getItem('subscriptionId');
-
-      if (subscriptionId) {
-        const notificationResponse = await axios.post('https://backend-aquaclean.onrender.com/api/push/send-notification', {
-          subscriptionId,
-          title: '¡Gracias por contactarnos!',
-          message: 'Tu mensaje ha sido enviado correctamente.',
-        });
-      }
-
+      resetForm();
+      sendPushNotification();
     } catch (error) {
-      setNotification({ type: 'error', message: 'Hubo un error al enviar el mensaje. Inténtalo de nuevo más tarde.' });
+      setNotification({ type: 'error', message: 'Hubo un error al enviar el mensaje.' });
     }
   };
+
+  const resetForm = () => {
+    setFormData({ name: '', email: '', message: '', topic: '' });
+  };
+
+  const sendPushNotification = () => {
+    const subscriptionId = localStorage.getItem('subscriptionId');
+    if (subscriptionId) {
+      axios.post('https://backend-aquaclean.onrender.com/api/push/send-notification', {
+        subscriptionId,
+        title: '¡Gracias por contactarnos!',
+        message: 'Tu mensaje ha sido enviado correctamente.',
+      });
+    }
+  };
+
+  const saveFormDataLocally = () => {
+    localStorage.setItem('contactFormData', JSON.stringify(formData));
+  };
+
+  const sendOfflineDataWhenOnline = () => {
+    const storedData = localStorage.getItem('contactFormData');
+    if (storedData) {
+      const data = JSON.parse(storedData);
+      axios.post('https://backend-aquaclean.onrender.com/api/contact', data)
+        .then(() => {
+          setNotification({ type: 'success', message: 'Mensaje enviado exitosamente' });
+          localStorage.removeItem('contactFormData');
+        })
+        .catch(() => {
+          setNotification({ type: 'error', message: 'Hubo un error al enviar el mensaje.' });
+        });
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('online', () => {
+      setIsOffline(false);
+      sendOfflineDataWhenOnline();
+    });
+    window.addEventListener('offline', () => setIsOffline(true));
+
+    return () => {
+      window.removeEventListener('online', () => {
+        setIsOffline(false);
+        sendOfflineDataWhenOnline();
+      });
+      window.removeEventListener('offline', () => setIsOffline(true));
+    };
+  }, []);
 
   useEffect(() => {
     if (notification) {
@@ -142,7 +150,7 @@ const ContactForm = () => {
     <div>
       {notification && (
         <Notification type={notification.type}>
-          <FontAwesomeIcon icon={notification.type === 'success' ? faCheckCircle : faExclamationCircle} />
+          <FontAwesomeIcon icon={notification.type === 'success' ? faCheckCircle : notification.type === 'error' ? faExclamationCircle : faCheckCircle} />
           {notification.message}
         </Notification>
       )}
