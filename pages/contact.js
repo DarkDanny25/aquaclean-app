@@ -78,27 +78,35 @@ const ContactForm = () => {
     }
 
     try {
-      await axios.post('https://backend-aquaclean.onrender.com/api/contact', formData);
+      const response = await axios.post('https://backend-aquaclean.onrender.com/api/contact', formData);
       setNotification({ type: 'success', message: 'Mensaje enviado exitosamente' });
-      resetForm();
-      sendPushNotification();
+
+      setFormData({
+        name: '',
+        email: '',
+        message: '',
+        topic: '',
+      });
+
+      const subscriptionId = localStorage.getItem('subscriptionId');
+      if (subscriptionId) {
+        await sendPushNotification(subscriptionId);
+      }
+
     } catch (error) {
       setNotification({ type: 'error', message: 'Hubo un error al enviar el mensaje.' });
     }
   };
 
-  const resetForm = () => {
-    setFormData({ name: '', email: '', message: '', topic: '' });
-  };
-
-  const sendPushNotification = () => {
-    const subscriptionId = localStorage.getItem('subscriptionId');
-    if (subscriptionId) {
-      axios.post('https://backend-aquaclean.onrender.com/api/push/send-notification', {
+  const sendPushNotification = async (subscriptionId) => {
+    try {
+      await axios.post('https://backend-aquaclean.onrender.com/api/push/send-notification', {
         subscriptionId,
         title: '¡Gracias por contactarnos!',
         message: 'Tu mensaje ha sido enviado correctamente.',
       });
+    } catch (error) {
+      console.error('Error al enviar la notificación push:', error);
     }
   };
 
@@ -150,7 +158,7 @@ const ContactForm = () => {
     <div>
       {notification && (
         <Notification type={notification.type}>
-          <FontAwesomeIcon icon={notification.type === 'success' ? faCheckCircle : notification.type === 'error' ? faExclamationCircle : faCheckCircle} />
+          <FontAwesomeIcon icon={notification.type === 'success' ? faCheckCircle : faExclamationCircle} />
           {notification.message}
         </Notification>
       )}
@@ -200,7 +208,7 @@ const ContactForm = () => {
             <Button type="submit">Enviar</Button>
           </FormContainer>
         </FormOverlay>
-        
+
         <ContactDetails>
           <h3>Por un Yucatán más limpio...</h3>
           <IconContainer>
