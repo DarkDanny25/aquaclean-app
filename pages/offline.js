@@ -1,4 +1,3 @@
-import { css } from '@emotion/react';
 import styled from '@emotion/styled';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWifi, faFrown } from '@fortawesome/free-solid-svg-icons';
@@ -16,32 +15,38 @@ const Container = styled.div`
 `;
 
 const Title = styled.h1`
-  font-size: 2rem;
+  font-size: 2.5rem;
   color: #343a40;
   margin-bottom: 1rem;
 `;
 
 const Message = styled.p`
-  font-size: 1.2rem;
+  font-size: 1.5rem;
   color: #6c757d;
-  margin-bottom: 1.5rem;
+  margin-bottom: 2rem;
 `;
 
 const Icon = styled(FontAwesomeIcon)`
+  font-size: 6rem;
+  color: #dc3545;
+  margin-bottom: 1.5rem;
+`;
+
+const SubIcon = styled(FontAwesomeIcon)`
   font-size: 4rem;
-  color: #adb5bd;
-  margin-bottom: 1rem;
+  color: #dc3545;
+  margin-top: 1rem;
 `;
 
 export default function Offline() {
   return (
     <Container>
       <Icon icon={faWifi} />
-      <Title>¡Oops, parece que no tienes conexión!</Title>
+      <Title>Oops, parece que no tienes conexión</Title>
       <Message>
         No pudimos cargar esta página. Por favor, verifica tu conexión a internet e inténtalo de nuevo.
       </Message>
-      <FontAwesomeIcon icon={faFrown} css={css`font-size: 3rem; color: #ff6f61;`} />
+      <SubIcon icon={faFrown} />
     </Container>
   );
 }
