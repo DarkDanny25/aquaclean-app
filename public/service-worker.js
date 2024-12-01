@@ -2,6 +2,31 @@ const CACHE_NAME = 'aquaClean-cache-v1';
 const urlsToCache = [
   '/',
   '/home',
+  '/about',
+  '/contact',
+  '/media',
+  '/manual',
+  '/offline',
+  '/img/about.jpg',
+  '/img/fondo1.jpeg',
+  '/img/fondo2.jpg',
+  '/img/fondo3.jpg',
+  '/img/fondo4.jpg',
+  '/img/fondo5.jpg',
+  '/img/galeria1.jpg',
+  '/img/galeria2.jpg',
+  '/img/galeria3.jpg',
+  '/img/galeria4.jpg',
+  '/img/galeria5.jpg',
+  '/img/galeria6.jpg',
+  '/img/galeria7.jpg',
+  '/img/galeria8.jpg',
+  '/img/logo.png',
+  '/img/manual1.jpg',
+  '/img/manual2.jpg',
+  '/img/manual3.jpeg',
+  '/img/manual4.jpg',
+  '/img/fallback-image.jpg',
   '/icon-192x192.png',
   '/icon-512x512.png',
   '/manifest.json',
@@ -10,14 +35,10 @@ const urlsToCache = [
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(async (cache) => {
-      try {
-        return await cache.addAll(urlsToCache);
-      } catch (err) {
-        console.error('Error al agregar a la caché:', err);
-      }
-    }).catch((err) => {
-      console.error('Error en la instalación del Service Worker:', err);
+    caches.open(CACHE_NAME).then((cache) => {
+      return cache.addAll(urlsToCache);
+    }).catch((error) => {
+      console.error('Error al precargar la caché:', error);
     })
   );
 });
@@ -25,20 +46,14 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
-    caches.keys().then(async (cacheNames) => {
-      try {
-        return await Promise.all(
-          cacheNames.map((cacheName) => {
-            if (!cacheWhitelist.includes(cacheName)) {
-              return caches.delete(cacheName);
-            }
-          })
-        );
-      } catch (err) {
-        console.error('Error en la activación del Service Worker:', err);
-      }
-    }).catch((err) => {
-      console.error('Error al obtener las claves de caché:', err);
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cacheName) => {
+          if (!cacheWhitelist.includes(cacheName)) {
+            return caches.delete(cacheName);
+          }
+        })
+      );
     })
   );
 });
@@ -50,25 +65,23 @@ self.addEventListener('fetch', (event) => {
         return cachedResponse;
       }
 
-      return fetch(event.request).catch(() => {
-        return caches.match('/home');
-      });
+      return fetch(event.request)
+        .then((networkResponse) => {
+          return caches.open(CACHE_NAME).then((cache) => {
+            if (event.request.method === 'GET') {
+              cache.put(event.request, networkResponse.clone());
+            }
+            return networkResponse;
+          });
+        })
+        .catch(() => {
+          if (event.request.destination === 'document') {
+            return caches.match('/offline');
+          }
+          if (event.request.destination === 'image') {
+            return caches.match('/img/fallback-image.jpg');
+          }
+        });
     })
-  );
-});
-
-self.addEventListener('push', (event) => {
-  const data = event.data ? event.data.json() : {};
-  console.log('Datos de la notificación push:', data);
-
-  const title = data.title || '¡Nueva Notificación!';
-  const options = {
-    body: data.message || 'Tienes un nuevo mensaje.',
-    icon: '/icon-192x192.png',
-    badge: '/icon-192x192.png',
-  };
-
-  event.waitUntil(
-    self.registration.showNotification(title, options)
   );
 });
