@@ -31,7 +31,7 @@ export default function Offline() {
     <Container>
       <FontAwesomeIcon 
         icon={faWifi} 
-        style={{ fontSize: '6rem', color: '#dc3545', marginBottom: '1.5rem' }} 
+        style={{ fontSize: '10rem', backgroundColor: '#dc3545', marginBottom: '1.5rem' }} 
       />
       <Title>¡Oops, parece que no tienes conexión!</Title>
       <Message>
@@ -39,7 +39,7 @@ export default function Offline() {
       </Message>
       <FontAwesomeIcon 
         icon={faFrown} 
-        style={{ fontSize: '4rem', color: '#dc3545', marginTop: '1rem' }} 
+        style={{ fontSize: '8rem', backgroundcolor: '#dc3545', marginTop: '1rem' }} 
       />
     </Container>
   );
