@@ -35,7 +35,7 @@ const formatNumber = (value, format) => {
 const Media = () => {
   const [data, setData] = useState([
     { title: 'Cenotes Limpios', value: 30, description: 'Cenotes limpiados en el último mes.', format: 'number' },
-    { title: 'Microplásticos Detectados', value: 2500, description: 'Kilogramos de microplásticos detectados.', format: 'kilo' },
+    { title: 'Microplásticos Detectados', value: 2500, description: 'Microplásticos detectados hasta ahora.', format: 'kilo' },
     { title: 'Voluntarios Activos', value: 50, description: 'Porcentaje de voluntarios activos.', format: 'percentage' },
     { title: 'Biodiversidad Restaurada', value: 100, description: 'Especies protegidas durante las limpiezas.', format: 'kilo' },
   ]);
