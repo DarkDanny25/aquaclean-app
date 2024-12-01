@@ -26,27 +26,21 @@ const Message = styled.p`
   margin-bottom: 2rem;
 `;
 
-const Icon = styled(FontAwesomeIcon)`
-  font-size: 6rem;
-  color: #dc3545;
-  margin-bottom: 1.5rem;
-`;
-
-const SubIcon = styled(FontAwesomeIcon)`
-  font-size: 4rem;
-  color: #dc3545;
-  margin-top: 1rem;
-`;
-
 export default function Offline() {
   return (
     <Container>
-      <Icon icon={faWifi} />
-      <Title>Oops, parece que no tienes conexión</Title>
+      <FontAwesomeIcon 
+        icon={faWifi} 
+        style={{ fontSize: '6rem', color: '#dc3545', marginBottom: '1.5rem' }} 
+      />
+      <Title>¡Oops, parece que no tienes conexión!</Title>
       <Message>
         No pudimos cargar esta página. Por favor, verifica tu conexión a internet e inténtalo de nuevo.
       </Message>
-      <SubIcon icon={faFrown} />
+      <FontAwesomeIcon 
+        icon={faFrown} 
+        style={{ fontSize: '4rem', color: '#dc3545', marginTop: '1rem' }} 
+      />
     </Container>
   );
 }
