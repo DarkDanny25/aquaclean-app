@@ -85,3 +85,17 @@ self.addEventListener('fetch', (event) => {
     })
   );
 });
+
+self.addEventListener('message', (event) => {
+  const allowedOrigins = ['https://aquaclean-app.vercel.app'];
+
+  if (allowedOrigins.includes(event.origin)) {
+    console.log('Mensaje recibido desde la página web:', event.data);
+    event.source.postMessage({
+      type: 'response',
+      message: 'Mensaje recibido correctamente',
+    });
+  } else {
+    console.warn('Origen no permitido para postMessage:', event.origin);
+  }
+});
