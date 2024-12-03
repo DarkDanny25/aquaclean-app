@@ -1,6 +1,5 @@
 const CACHE_NAME = 'aquaClean-cache-v1';
 const urlsToCache = [
-  '/',
   '/home',
   '/about',
   '/contact',
